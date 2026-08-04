@@ -2,7 +2,7 @@
 
 Interactive, single-file decision guides for Microsoft Power Platform, published with GitHub Pages.
 
-**Live site:** https://soundharya2012.github.io/pp-guides/
+**Live site:** https://soundharya2012.github.io/pp/
 
 | Guide | What it answers |
 |---|---|
