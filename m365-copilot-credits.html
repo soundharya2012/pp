@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Power Platform environments: Developer vs Sandbox vs Production</title>
+<title>Microsoft 365 Copilot: included vs Copilot Credits</title>
 <style>
 
 :root{
@@ -198,218 +198,225 @@ footer{background:var(--white);border-top:1px solid #ececf3;padding:40px 24px;}
    build.ps1 -Config sites\<name>.js swaps everything between the markers.
    ===================================================================== */
 /* CONFIG-START */
-// PUBLIC EDITION - no internal links, no brand assets. Sources: Microsoft Learn only.
-// Sources (Microsoft Learn, checked Aug 2026): admin/environments-overview,
-// developer/plan, admin/backup-restore-environments, admin/copy-environment,
-// alm/environment-strategy-alm.
-// Build:  .\build.ps1 -Config .\sites\pp-environments.js
+// PUBLIC EDITION - no internal references, no brand assets.
+// Every rate and rule below is from Microsoft Learn, checked 4 Aug 2026:
+//   microsoft-copilot-studio/requirements-messages-management  (billing rates + footnotes 1-4)
+//   microsoft-copilot-studio/billing-licensing                 (what an M365 Copilot licence includes)
+//   ai-builder/licensing-prompt-tokens                         (prompts outside agents)
+// Build:  .\build.ps1 -Config .\sites\copilot-credits-public.js -NoBrand -HomeUrl "index.html"
 const CONFIG = {
-  title: 'Power Platform environments: Developer vs Sandbox vs Production',
-  eyebrow: 'Environment strategy guide',
-  h1: 'Power Platform environments:<br>when to use <span class="hl">Developer</span>, <span class="hl">Sandbox</span> or <span class="hl">Production</span>',
-  sub: 'Answer up to three questions about who will use the environment and what it must do, and this guide routes you to the right environment type — plus the licensing, capacity and backup consequences of that choice.',
+  title: 'Microsoft 365 Copilot: included vs Copilot Credits',
+  eyebrow: 'Licensing decision guide',
+  h1: 'Microsoft 365 Copilot:<br><span class="hl">included</span> vs when <span class="hl">Copilot Credits</span> are consumed',
+  sub: 'Answer up to three questions about your scenario and this guide routes you straight to the answer, then shows the exact credit rate that applies if the activity is billable.',
   ctas: [
     {label:'Start the guide &nbsp;&rarr;', href:'#decide', style:'btn-primary'},
-    {label:'Browse the comparison tables', href:'#reference', style:'btn-ghost'}
+    {label:'Browse the rates and rules', href:'#reference', style:'btn-ghost'}
   ],
   stats: [
-    {k:'Developer', v:'Free, owner-only, 2 GB, dev/test only'},
-    {k:'Sandbox', v:'Shared dev + test, copy / reset / restore target'},
-    {k:'Production', v:'Anything real users depend on'}
+    {k:'Included', v:'Licensed employee, agent runs as their identity'},
+    {k:'Billable', v:'External, unlicensed, autonomous, CUA'},
+    {k:'Currency', v:'Copilot Credits, replaced messages Sept 2025'},
+    {k:'Enforcement', v:'Agents disabled at 125% of prepaid capacity'}
   ],
-  wizardTitle: 'Which environment type do I need?',
+  wizardTitle: 'Is my scenario included or billable?',
   steps: 3,
 
   nodes: {
-    q1:{step:1, q:'What will this environment be used for?', options:[
-      {l:'My own learning, a spike or a personal demo', c:'I am the only maker; nobody depends on it', go:'q2'},
-      {l:'Team development of a solution that will ship', c:'Several makers, source control / pipelines, a real ALM chain', go:'r_sandbox_dev'},
-      {l:'Testing, UAT, training or release validation', c:'Needs a copy of production schema, or of production data', go:'r_sandbox_test'},
-      {l:'Live business use by real users', c:'Real data, real processes, people depend on it', go:'q3'},
-      {l:'A short evaluation I will throw away', c:'Trying a feature out for a few weeks', go:'r_trial'}
+    q1:{step:1, q:'Who is interacting with the agent?', options:[
+      {l:'An employee licensed for Microsoft 365 Copilot', c:'Interactive, authenticated under their own identity', go:'q2'},
+      {l:'An internal user without an M365 Copilot licence', c:'A colleague who is not licensed', go:'cr_unlic'},
+      {l:'An external person or customer', c:'A customer-facing agent', go:'cr_ext'},
+      {l:'Nobody. It runs autonomously', c:'Event-triggered or scheduled, no interactive user', go:'cr_auto'}
     ]},
-    q2:{step:2, q:'What does your personal build work actually need?', options:[
-      {l:'Only Power Apps, Power Automate and Dataverse', c:'Under 2 GB of data and 750 flow runs a month', go:'r_dev'},
-      {l:'Dynamics 365 apps, dataflows, AI Builder or RPA', c:'Capabilities the Developer Plan does not include', go:'r_sandbox_dev'},
-      {l:'Access controlled by a security group', c:'Or more than a handful of named makers', go:'r_sandbox_dev'},
-      {l:'A copy of production data or schema', c:'Debugging against something that looks like prod', go:'r_sandbox_test'},
-      {l:'Other people to run the app for their day job', c:'Not just help me build it', go:'r_prod'}
+    q2:{step:2, q:'What is the licensed employee actually using?', options:[
+      {l:'Chatting with an agent', c:'In Microsoft 365 Copilot Chat, Teams or SharePoint', go:'inc_chat'},
+      {l:'Answers, agent actions or tenant graph grounding', c:'Classic or generative answers, triggers, deep reasoning, RAG over Graph', go:'inc_core'},
+      {l:'AI tools or prompts inside the agent', c:'Text and generative AI tools invoked by the agent', go:'inc_aitools'},
+      {l:'A Computer-Using Agent', c:'An agent that operates a computer interface', go:'cr_cua'},
+      {l:'An agent flow', c:'A flow the agent runs', go:'q3'},
+      {l:'A prompt in a standalone app or cloud flow', c:'Outside a Copilot Studio agent', go:'standalone'},
+      {l:'Testing or training', c:'Test panel, test chat, flow designer test runs', go:'free_testing'}
     ]},
-    q3:{step:3, q:'How critical is the live workload?', options:[
-      {l:'Business-critical, regulated or handling sensitive data', c:'Needs longer backup retention, DLP isolation, governance', go:'r_prod_managed'},
-      {l:'A normal departmental or team app', c:'Important, but standard risk', go:'r_prod'},
-      {l:'One person\u2019s personal productivity, nothing depends on it', c:'No integrations, no shared data, disposable', go:'r_default'}
+    q3:{step:3, q:'Which trigger starts the agent flow?', options:[
+      {l:'"When an agent calls the flow"', c:'The agent invokes the flow directly', go:'inc_flow'},
+      {l:'Any other trigger', c:'Scheduled, event-based, manual or connector-based', go:'cr_flow'}
     ]}
   },
 
   results: {
-    r_dev:{type:'alt', verdict:'Use a Developer environment', title:'Developer environment (Power Apps Developer Plan)',
-      lead:'Free, owner-scoped, and the right place to learn, prototype and test premium and custom connectors without touching shared environments.',
+    inc_chat:{type:'good', verdict:'Included, no charge', title:'Covered by the Microsoft 365 Copilot licence',
+      lead:'Using agents in Copilot Chat, Teams or SharePoint for classic answers, generative answers or tenant graph grounding is zero-rated for licensed users.',
       facts:[
-        ['License','Power Apps Developer Plan — free, but it is a viral/internal license your admin must allow in the tenant.'],
-        ['Limits','2 GB Dataverse database and 750 flow runs per month. No add-ons: if you hit the ceiling you need a paid plan.'],
-        ['Not included','Dataflows, Dynamics 365 apps, AI Builder use rights and Power Automate RPA use rights.'],
-        ['Access','Intended for the owner. Coworkers can be added manually as makers/admins, but security groups cannot be assigned.'],
-        ['Lifecycle','Up to three per user; auto-disabled after 30 days of inactivity; admins can block creation entirely.'],
-        ['Capacity','Its entitlements do not count against your tenant quota — the cheapest way to give makers room.'],
-        ['Ship path','Export as a solution and import into sandbox, then production. Apps show a developer-environment banner until they move.']
+        ['Why','Employee-facing (B2E) usage is included in the M365 Copilot USL when the user is licensed and the agent runs under their authenticated identity.'],
+        ['Also included','Copilot Chat with Pages, Copilot in Microsoft 365 apps, SharePoint agents, Copilot Analytics.'],
+        ['Condition','Subject to fair-usage limits, which Microsoft may change.']
       ], note:true},
 
-    r_sandbox_dev:{type:'warn', verdict:'Use a Sandbox environment', title:'Sandbox as your shared development environment',
-      lead:'Sandbox gives you full control plus the capabilities the Developer Plan lacks, and it is the type a real dev → test → prod chain is built on.',
+    inc_core:{type:'good', verdict:'Included, no charge', title:'Answers, agent actions and graph grounding are covered',
+      lead:'For a licensed employee these are all zero-rated, even though each carries a credit rate for everyone else.',
       facts:[
-        ['Why not developer','Developer environments cap out at 2 GB / 750 flow runs, exclude dataflows and Dynamics 365 apps, and cannot be scoped with a security group.'],
-        ['Seeding it','Copy from production with "Customizations and schemas only" to get prod schema and users without prod data — the documented pattern for iterative team development and PoCs.'],
-        ['Capacity','Consumes tenant Dataverse capacity; you need at least 1 GB free to create or copy an environment.'],
-        ['Governance','Admins can restrict who provisions sandboxes; separate dev environments keep unfinished work from colliding.'],
-        ['Later','A sandbox can be converted to production once the solution is ready to serve users.'],
-        ['Region','Keep dev/test in the same or an earlier service-update station than production — you cannot reliably import a solution into an older-version environment.']
+        ['Classic answer','1 credit normally, no charge for a licensed user.'],
+        ['Generative answer','2 credits normally, no charge for a licensed user.'],
+        ['Agent action','5 credits normally. Covers triggers, deep reasoning and topic transitions.'],
+        ['Tenant graph grounding','10 credits normally. RAG over your tenant-wide Microsoft Graph.'],
+        ['Excluded','Computer-Using Agents, which are billed at the agent action rate and are not in the USL.'],
+        ['Reasoning models','A reasoning model adds the premium AI tools rate on top of the feature rate, per 1,000 tokens.']
+      ], note:true},
+
+    inc_aitools:{type:'good', verdict:'Included, no charge', title:'AI tools inside the agent are covered',
+      lead:'Text and generative AI tools invoked by an agent are zero-rated when a licensed employee drives them.',
+      facts:[
+        ['Basic tools','1 credit per 10 responses, or 0.1 credit per 1K tokens.'],
+        ['Standard tools','15 credits per 10 responses, or 1.5 credits per 1K tokens.'],
+        ['Premium tools','100 credits per 10 responses, or 10 credits per 1K tokens. This is also what advanced reasoning bills as.'],
+        ['Content processing','8 credits per page.'],
+        ['Condition','Zero-rated only for a licensed user under their own identity, within fair usage.']
+      ], note:true},
+
+    inc_flow:{type:'good', verdict:'Included, no charge', title:'This is the one free agent-flow trigger',
+      lead:'Agent flow actions are included at no charge for a licensed user, but only through the "When an agent calls the flow" trigger.',
+      facts:[
+        ['Rate otherwise','13 credits per 100 agent flow actions.'],
+        ['Enforcement','These runs do not consume credits and are exempt from agent flow enforcement.'],
+        ['Any other trigger','Consumes credits at the standard rate, even for a licensed user.']
+      ], note:true},
+
+    free_testing:{type:'info', verdict:'Always free', title:'Testing does not consume capacity',
+      lead:'Testing an agent or an agent flow is free, and test runs are never blocked by enforcement.',
+      facts:[
+        ['Covers','The agent test chat panel and testing an agent flow in the flow designer.'],
+        ['Who','Any maker, no licence condition.'],
+        ['Note','A trial licence lets you build and test agents but not publish them.']
       ], note:false},
 
-    r_sandbox_test:{type:'warn', verdict:'Use a Sandbox environment', title:'Sandbox for test, UAT, training or debugging on prod-like data',
-      lead:'Sandbox is the only non-production type that can receive a copy or a restore, which is exactly what test, UAT and training need.',
+    standalone:{type:'warn', verdict:'Different licence applies', title:'Prompts outside an agent are not covered by the Copilot USL',
+      lead:'A prompt running in a standalone app or a cloud flow sits outside the agent, so the M365 Copilot inclusion does not apply.',
       facts:[
-        ['Copy level','"Everything" (data + users + customizations) for UAT, upgrade testing and training; "Customizations and schemas only" when the data must not leave production.'],
-        ['Target rules','You can copy only to a sandbox or preview environment — never to production, and never from or to default or trial environments.'],
-        ['Restore rules','Production and sandbox backups can only be restored into a sandbox. Same region, and managed only to managed.'],
-        ['After the copy','The target lands in administration mode with background operations disabled. Review flows, connection references and custom connectors before you re-enable.'],
-        ['Timing','Copy and restore typically take up to 8 hours, and up to 24 if you include large or audit data — plan the UAT window around it.'],
-        ['Reset','Reset wipes a sandbox back to empty, which no production environment allows.']
+        ['What applies','AI Builder prompt licensing and prompt token metering, not the M365 Copilot USL.'],
+        ['Plain cloud flows','Power Automate cloud flows use Power Automate licensing and never consume Copilot Credits.'],
+        ['Why it matters','Moving a prompt out of an agent into a flow silently changes which meter it bills against.']
       ], note:false},
 
-    r_prod:{type:'good', verdict:'Use a Production environment', title:'Production environment',
-      lead:'Anything real users depend on belongs in production. It is the only type Microsoft positions for permanent work.',
+    cr_cua:{type:'bad', verdict:'Copilot Credits consumed', title:'Computer-Using Agents are excluded',
+      lead:'Computer-Using Agent usage is explicitly not included in the Microsoft 365 Copilot licence.',
       facts:[
-        ['Who can create','An admin, or anyone with a Power Apps license, provided 1 GB of database capacity is free.'],
-        ['Licensing','Users need real licenses — a Developer Plan cannot launch premium apps outside a developer environment.'],
-        ['Backups','System and manual backups retained 7 days by default (28 only for production managed environments).'],
-        ['Restore caveat','You cannot restore directly over production: switch the type to sandbox, restore, then switch straight back — while it is a sandbox you can only reach backups from the last 7 days.'],
-        ['Not a copy target','Production never appears in the copy/restore target list, which is the guard against accidental overwrites.'],
-        ['Pair it','Always keep at least one separate test environment so the deployment itself gets tested, not just the app.']
+        ['Rate','Billed at the agent action rate, 5 credits.'],
+        ['Applies to','Every user, including a fully licensed employee.']
       ], note:false},
 
-    r_prod_managed:{type:'good', verdict:'Production + Managed Environment', title:'Production environment, enabled as a Managed Environment',
-      lead:'Business-critical or regulated workloads need production plus the governance layer: longer backup retention, sharing limits and tenant-wide visibility.',
+    cr_flow:{type:'bad', verdict:'Copilot Credits consumed', title:'This agent-flow trigger is billable',
+      lead:'Only the "When an agent calls the flow" trigger carries the no-charge inclusion. Every other trigger bills.',
       facts:[
-        ['Backup retention','Only production managed environments can extend retention beyond 7 days, to 14, 21 or 28 days (admin center or PowerShell).'],
-        ['Licensing cost','Managed Environment use rights are not included in the Developer Plan — every user running assets there needs a premium license.'],
-        ['Restore pairing','A managed environment can only be restored from another managed environment; plan your test environment to match.'],
-        ['Isolation','Give the workload its own environment rather than sharing one, so DLP policies, security groups and capacity are scoped to it.'],
-        ['Encryption','If you apply a customer-managed key, every copy/restore target must carry the same key.']
+        ['Rate','13 credits per 100 agent flow actions.'],
+        ['Applies to','Every user, including a licensed employee.'],
+        ['Enforcement','When prepaid capacity is exhausted, new agent flow runs are blocked while the agent keeps answering.']
       ], note:false},
 
-    r_default:{type:'bad', verdict:'Do not build here', title:'The default environment is not an environment strategy',
-      lead:'It is fine for a throwaway personal flow and wrong for everything else. Move anything with a dependency into its own environment.',
+    cr_unlic:{type:'bad', verdict:'Copilot Credits consumed', title:'Unlicensed internal user',
+      lead:'Without an M365 Copilot licence there is nothing to zero-rate the usage against, so every interaction bills.',
       facts:[
-        ['Shared by everyone','One per tenant, shared by all users, and every licensed user automatically gets the Environment Maker role.'],
-        ['No guarantees','Microsoft states it provides no backup guarantees and should not be used for production workloads.'],
-        ['Cannot be undone','You cannot delete it, cannot take a manual backup, and cannot restore a backup over it — a default backup can only be restored into a developer environment.'],
-        ['Cannot be copied','Copy operations cannot use a default environment as source or target.'],
-        ['Better','Rename it something like "Personal Productivity", secure it, and create a production environment for anything real.']
+        ['Rates','1 credit classic answer, 2 generative answer, 5 agent action, 10 tenant graph grounding.'],
+        ['Worked example','An agent using 4 generative answers plus 4 graph-grounded responses costs 48 credits per user per day; Microsoft counts only the unlicensed users.']
       ], note:false},
 
-    r_trial:{type:'info', verdict:'Use a Trial environment', title:'Trial environment — for short evaluations only',
-      lead:'Trials are designed to be thrown away, so never let anything you care about live in one.',
+    cr_ext:{type:'bad', verdict:'Copilot Credits consumed', title:'External or customer-facing agent',
+      lead:'The inclusion covers employee-facing usage only, so a customer-facing agent is always billable.',
       facts:[
-        ['Lifetime','Expires after 30 days, limited to one per user, and automatically cleaned up.'],
-        ['No safety net','Trial environments are not backed up at all, and backup/restore is unsupported.'],
-        ['No copy','You cannot copy from or to a trial environment.'],
-        ['If it works out','Convert the trial to production to get the full feature set, including backup and restore.']
+        ['Rates','Same per-feature rates apply to every interaction.'],
+        ['Worked example','4 classic answers plus 2 generative answers for 900 customers a day is 7,200 credits a day.'],
+        ['Voice','Voice adds a per-minute rate: 10 credits classic, 35 GenAI, 75 premium GenAI, with core agent activity included.']
+      ], note:false},
+
+    cr_auto:{type:'bad', verdict:'Copilot Credits consumed', title:'Autonomous or event-triggered agent',
+      lead:'With no interactive licensed identity behind the run, there is nothing for the licence to cover.',
+      facts:[
+        ['Why','The inclusion requires the agent to operate under an authenticated licensed user identity.'],
+        ['Worked example','An order-processing agent firing 4 agent actions per order costs 20 credits per run.'],
+        ['Internal or not','It makes no difference that the agent is internal-facing.']
       ], note:false}
   },
-  noteText: '<b>Developer environments are for development and test only.</b> Production use of a Developer Plan environment is outside the plan terms, and the environment is disabled after 30 days without activity — never let a business process end up depending on one.',
+  noteText: '<b>Fair usage still applies.</b> Included capabilities are subject to fair-usage limits, and Microsoft reserves the right to update those limits as new usage patterns emerge.',
 
   refKicker: 'Full reference',
-  refHeading: 'Developer, Sandbox and Production side by side',
-  refIntro: 'Everything the guide is built on, drawn from the Microsoft Learn environment, Developer Plan, backup/restore and copy articles.',
+  refHeading: 'Rates, inclusions and enforcement',
+  refIntro: 'The published credit rates, what the Microsoft 365 Copilot licence covers, and what happens when you run out of capacity.',
   cards: [
-    {head:'info', icon:'&#128187;', title:'Developer environment', sub:'Free, owner-scoped, dev/test only',
-      columns:['Fact','Detail'],
+    {wide:true, head:'dark', icon:'&#128178;', title:'Published credit rates', sub:'Per feature, and what a licensed employee pays',
+      columns:['Agent feature','Rate','M365 Copilot licensed user'],
       rows:[
-        ['License','Power Apps Developer Plan (viral/internal — admin must allow it)'],
-        ['Cost','Free; capacity does not count against tenant quota'],
-        ['Database size','2 GB, no add-ons available'],
-        ['Flow runs','750 per month'],
-        ['Dataflows','<span class="pill pill-bad">Not available</span>'],
-        ['Dynamics 365 apps','<span class="pill pill-bad">Cannot be installed</span>'],
-        ['AI Builder / RPA rights','<span class="pill pill-bad">Not included</span> (trials only)'],
-        ['Security groups','<span class="pill pill-bad">Cannot be assigned</span>; add users manually'],
-        ['Backups','System + manual, 7 days'],
-        ['Limits','Up to 3 per user; disabled after 30 days of inactivity'],
-        ['Apps','Show a developer-environment banner until moved out']
+        ['Classic answer','1 credit','<span class="pill pill-good">No charge</span>'],
+        ['Generative answer','2 credits','<span class="pill pill-good">No charge</span>'],
+        ['Agent action (triggers, deep reasoning, topic transitions)','5 credits','<span class="pill pill-good">No charge</span>'],
+        ['Tenant graph grounding','10 credits','<span class="pill pill-good">No charge</span>'],
+        ['Agent flow actions, per 100','13 credits','<span class="pill pill-warn">Only via the agent-calls-flow trigger</span>'],
+        ['AI tools, basic, per 10 responses','1 credit','<span class="pill pill-good">No charge</span>'],
+        ['AI tools, standard, per 10 responses','15 credits','<span class="pill pill-good">No charge</span>'],
+        ['AI tools, premium, per 10 responses','100 credits','<span class="pill pill-good">No charge</span>'],
+        ['Content processing, per page','8 credits','<span class="pill pill-good">No charge</span>'],
+        ['Computer-Using Agent','5 credits (agent action rate)','<span class="pill pill-bad">Not included</span>'],
+        ['Voice, classic orchestration, per minute','10 credits','Core agent activity included'],
+        ['Voice, GenAI, per minute','35 credits','Core agent activity included'],
+        ['Voice, premium GenAI, per minute','75 credits','Core agent activity included']
       ]},
 
-    {head:'warn', icon:'&#128295;', title:'Sandbox environment', sub:'Non-production: shared dev, test, UAT, training',
-      columns:['Capability','Detail'],
+    {head:'good', icon:'&#10003;', title:'What the licence includes', sub:'Employee-facing usage, licensed user, own identity',
+      columns:['Included','Condition'],
       rows:[
-        ['Intended use','Development and testing, separate from production'],
-        ['Copy','<span class="pill pill-good">Supported</span> — "Everything" or "Customizations and schemas only"'],
-        ['Copy target','<span class="pill pill-good">Yes</span> — sandbox/preview are the only valid targets'],
-        ['Restore target','<span class="pill pill-good">Yes</span> — where production backups must land'],
-        ['Reset','<span class="pill pill-good">Supported</span> — wipe back to empty'],
-        ['Convert','Can be promoted to production later'],
-        ['Security groups','Supported; full admin control'],
-        ['Capacity','Consumes tenant capacity; 1 GB free needed to create/copy/restore'],
-        ['Backups','System + manual, 7 days'],
-        ['After a copy','Lands in administration mode, background operations disabled']
+        ['Agents in Copilot Chat, Teams and SharePoint','Classic answers, generative answers, tenant graph grounding are zero-rated'],
+        ['Microsoft 365 Copilot Chat, including Pages','Part of the licence'],
+        ['Copilot in Microsoft 365 apps, including Teams','Part of the licence'],
+        ['SharePoint agents','Part of the licence'],
+        ['Agent capabilities built in Copilot Studio','When used in M365 Copilot, Teams or SharePoint'],
+        ['Agent flow actions','<span class="pill pill-warn">Only</span> via the "When an agent calls the flow" trigger'],
+        ['Copilot Analytics and SharePoint Advanced Management','Part of the licence'],
+        ['Testing agents and agent flows','<span class="pill pill-good">Always free</span>, and exempt from enforcement']
       ]},
 
-    {head:'good', icon:'&#10003;', title:'Production environment', sub:'Permanent business work, real users',
-      columns:['Fact','Detail'],
+    {head:'bad', icon:'&#9889;', title:'What consumes credits', sub:'No inclusion applies',
+      columns:['Scenario','Why'],
       rows:[
-        ['Intended use','Anything your organization depends on'],
-        ['Created by','Admin, or any Power Apps licensed user with 1 GB free capacity'],
-        ['Backups','7 days system + manual; 28 days only as a managed environment'],
-        ['Restore over it','<span class="pill pill-bad">Not directly</span> — switch to sandbox, restore, switch back'],
-        ['Copy target','<span class="pill pill-bad">Never</span> — protects against overwrites'],
-        ['Deleted by mistake','Recoverable within 7 days (28 with Dynamics 365 apps)'],
-        ['Governance','Managed Environments, DLP policies, security groups, customer-managed key'],
-        ['Pair with','At least one separate test environment (ALM minimum)']
+        ['External or customer-facing agents','The inclusion is employee-facing only'],
+        ['Unlicensed internal users','No M365 Copilot licence to zero-rate against'],
+        ['Autonomous or event-triggered runs','No authenticated licensed user identity behind the run'],
+        ['Computer-Using Agents','Explicitly excluded from the licence'],
+        ['Agent flows on any other trigger','Only one trigger carries the inclusion'],
+        ['Prompts in standalone apps or cloud flows','AI Builder prompt licensing applies instead'],
+        ['Usage beyond fair-usage limits','The inclusion is bounded by fair usage'],
+        ['Bring-your-own-model, including Azure Foundry','Billed separately from Copilot Studio rates']
       ]},
 
-    {head:'bad', icon:'&#9888;', title:'Default environment', sub:'The one everybody accidentally builds in',
-      columns:['Fact','Detail'],
+    {wide:true, head:'warn', icon:'&#9888;', title:'Capacity and enforcement', sub:'What happens when the credits run out',
+      columns:['Rule','Detail'],
       rows:[
-        ['Who has access','Every licensed user in the tenant is an Environment Maker'],
-        ['Backup guarantee','<span class="pill pill-bad">None</span>; not for production workloads'],
-        ['Manual backup','<span class="pill pill-bad">Not supported</span>'],
-        ['Restore over it','<span class="pill pill-bad">Not supported</span> — restore its backup to a developer environment'],
-        ['Copy','Cannot be a copy source or target'],
-        ['Storage','1 TB cap; 3 GB DB + 3 GB file + 1 GB log included'],
-        ['Delete','<span class="pill pill-bad">Impossible</span>'],
-        ['Do instead','Rename it, secure it, and treat it as personal productivity only']
+        ['Pooling','Purchased credits are pooled across the tenant and can be allocated per environment.'],
+        ['No rollover','Capacity is enforced monthly and unused credits do not carry over.'],
+        ['Overage grace','Some overage is allowed rather than blocking business processes immediately.'],
+        ['Agent enforcement','At 125% of prepaid capacity custom agents are disabled. In-flight conversations finish; new invocations are rejected.'],
+        ['What users see','"There is a billing issue" or "This agent is currently unavailable. It has reached its usage limit."'],
+        ['Agent flow enforcement','Once prepaid capacity is fully consumed, new agent flow runs are blocked but the agent keeps answering.'],
+        ['Exemptions','Runs by licensed users via the agent-calls-flow trigger, and test runs.'],
+        ['Ways out','Reallocate capacity, buy more credits, or link an Azure subscription for pay-as-you-go, which removes enforcement.'],
+        ['Per-agent caps','Monthly consumption limits can be set per agent in the Power Platform admin center.'],
+        ['Ways to buy','Pay-as-you-go via Azure, prepaid credit packs, or a one-year prepurchase of commit units.']
       ]},
 
-    {wide:true, head:'dark', icon:'&#9776;', title:'Decision matrix', sub:'Same question asked of each type',
-      columns:['Question','Developer','Sandbox','Production'],
+    {wide:true, head:'info', icon:'&#9881;', title:'Same capability, different cost by context', sub:'Where a prompt or flow runs decides the meter',
+      columns:['Where it runs','Who uses it','Cost'],
       rows:[
-        ['Real end users allowed?','<span class="pill pill-bad">No</span>','<span class="pill pill-warn">Testers only</span>','<span class="pill pill-good">Yes</span>'],
-        ['Counts against tenant capacity?','<span class="pill pill-good">No</span>','Yes (1 GB min)','Yes (1 GB min)'],
-        ['Max Dataverse database','2 GB','Your allocated capacity','Your allocated capacity'],
-        ['Security groups','<span class="pill pill-bad">No</span>','<span class="pill pill-good">Yes</span>','<span class="pill pill-good">Yes</span>'],
-        ['Dynamics 365 apps / dataflows','<span class="pill pill-bad">No</span>','<span class="pill pill-good">Yes</span>','<span class="pill pill-good">Yes</span>'],
-        ['Can be a copy target','<span class="pill pill-bad">No</span>','<span class="pill pill-good">Yes</span>','<span class="pill pill-bad">No</span>'],
-        ['Can be a restore target','<span class="pill pill-good">Yes</span>','<span class="pill pill-good">Yes</span>','<span class="pill pill-bad">No</span> (switch to sandbox first)'],
-        ['Reset supported','<span class="pill pill-good">Yes</span>','<span class="pill pill-good">Yes</span>','<span class="pill pill-bad">No</span>'],
-        ['Backup retention','7 days','7 days','7 days (28 if managed)'],
-        ['Auto-cleanup','Disabled after 30 days idle','None','None'],
-        ['Cost','Free','Tenant capacity','Tenant capacity + user licenses']
-      ]},
-
-    {wide:true, head:'info', icon:'&#128260;', title:'A minimum viable ALM chain', sub:'What Microsoft recommends you actually stand up',
-      columns:['Stage','Environment type','Why'],
-      rows:[
-        ['Personal spike / learning','Developer','Free, isolated, no tenant capacity consumed'],
-        ['Team development','Sandbox (one per work stream if changes collide)','Security groups, full feature set, seed with schema-only copy'],
-        ['Test / UAT / training','Sandbox','Only valid copy and restore target; tests the deployment, not just the app'],
-        ['Production','Production (managed if business-critical)','Permanent work, backups, governance, real licensing']
+        ['Inside a Copilot Studio agent','Licensed employee, own identity','<span class="pill pill-good">No charge</span>'],
+        ['Inside a Copilot Studio agent','Unlicensed, external or autonomous','<span class="pill pill-bad">Copilot Credits</span>'],
+        ['Standalone app or cloud flow prompt','Anyone','<span class="pill pill-warn">AI Builder prompt licensing</span>'],
+        ['Agent flow, "When an agent calls the flow"','Licensed employee','<span class="pill pill-good">No charge</span>'],
+        ['Agent flow, any other trigger','Anyone, including licensed','<span class="pill pill-bad">Copilot Credits</span>'],
+        ['Plain Power Automate cloud flow, no AI','Anyone','<span class="pill pill-good">Power Automate licensing</span>']
       ]}
   ],
 
   rule:{icon:'&#128161;', title:'Rule of thumb',
-    text:'<b>Developer</b> = one maker, free, throwaway, never production. <b>Sandbox</b> = shared development and every kind of testing, because it is the only type that can receive a copy or a restore. <b>Production</b> = the moment anyone other than the maker depends on it. And the <b>default environment</b> is not a strategy — nothing that matters should live there. If your organisation publishes its own ALM standard, and it is stricter than these product defaults, follow the internal standard.'},
+    text:'If a <b>licensed employee</b> is interacting with the agent under their <b>own identity</b>, it is <b>included</b>, including the AI tools the agent invokes. If the consumer is <b>external</b> or <b>unlicensed</b>, or the agent runs <b>autonomously</b>, uses a <b>Computer-Using Agent</b>, or fires an agent flow from <b>any trigger other than "When an agent calls the flow"</b>, it <b>consumes Copilot Credits</b>. And included does not mean unlimited: fair-usage limits still apply.'},
 
-  footer:'<b>Environment strategy guide</b> — product behaviour compiled from Microsoft Learn (environments overview, Power Apps Developer Plan, back up and restore environments, copy an environment, ALM environment strategy), verified August 2026. Microsoft changes limits and licensing terms frequently, and your organisation may enforce a stricter ALM standard than the product defaults shown here — confirm both before committing to a design.'
+  footer:'<b>Licensing decision guide</b> — rates and rules compiled from Microsoft Learn: Copilot Studio billing rates and management, licensing for agents powered by the standard harness, and AI Builder prompt licensing. Verified 4 August 2026. Copilot Credits replaced messages as the billing currency on 1 September 2025. Microsoft changes rates, inclusions and fair-usage limits frequently, and the Copilot Studio Licensing Guide is the authoritative source — confirm there before committing to a design or a budget.'
 };
 
 /* CONFIG-END */

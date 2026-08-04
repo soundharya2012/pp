@@ -3,31 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Interactive Power Platform guides</title>
-<meta name="description" content="Interactive, single-file decision guides for Microsoft Power Platform.">
+<title>Interactive Power Platform and Copilot guides</title>
+<meta name="description" content="Interactive single-page decision guides for Microsoft Power Platform and Microsoft 365 Copilot licensing.">
 <style>
 :root{--accent:#FFC53D;--dark:#1A1A24;--offblack:#2E2E38;--offwhite:#F6F6FA;--gray:#747480;--blue:#155CB4;}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--offblack);background:var(--offwhite);line-height:1.55}
-header{background:var(--dark);color:#fff;padding:44px 24px 56px;position:relative;overflow:hidden}
+header{background:var(--dark);color:#fff;padding:44px 24px 60px;position:relative;overflow:hidden}
 header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;background:linear-gradient(90deg,var(--accent),#188CE5)}
-.wrap{max-width:900px;margin:0 auto;padding:0 24px}
-.wordmark{font-size:20px;font-weight:700;margin-bottom:32px}
+.wrap{max-width:940px;margin:0 auto;padding:0 24px}
+.wordmark{font-size:20px;font-weight:700;margin-bottom:34px}
 .wordmark::before{content:"";display:inline-block;width:10px;height:20px;background:var(--accent);margin-right:10px;vertical-align:-3px;border-radius:2px}
-h1{font-size:clamp(28px,5vw,44px);line-height:1.1;font-weight:700;max-width:700px}
-header p{margin-top:14px;font-size:clamp(16px,2vw,19px);color:#e8e8ef;font-weight:300;max-width:640px}
-main{padding:48px 0 64px}
-.grid{display:grid;gap:18px}
-.card{background:#fff;border:1px solid #ececf3;border-radius:14px;box-shadow:0 8px 24px rgba(46,46,56,.06);overflow:hidden;display:block;text-decoration:none;color:inherit;transition:transform .12s ease,box-shadow .12s ease}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.1;font-weight:700;max-width:720px}
+header p{margin-top:14px;font-size:clamp(16px,2vw,19px);color:#e8e8ef;font-weight:300;max-width:650px}
+main{padding:46px 0 60px}
+h2{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-bottom:18px}
+.grid{display:grid;gap:18px;grid-template-columns:1fr 1fr}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid #ececf3;border-radius:14px;box-shadow:0 8px 24px rgba(46,46,56,.06);overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:transform .12s ease,box-shadow .12s ease}
 .card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(46,46,56,.12)}
-.card-head{background:var(--offblack);color:#fff;padding:16px 22px;font-weight:700;font-size:17px;display:flex;align-items:center;gap:10px}
-.card-body{padding:20px 22px}
-.card-body p{color:var(--gray);font-size:15px}
-.tags{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
-.tag{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--offwhite);border:1px solid #dcdce5;color:var(--gray);border-radius:20px;padding:4px 11px}
-.go{margin-top:16px;font-weight:700;color:var(--blue);font-size:15px}
-h2{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-bottom:16px}
-footer{border-top:1px solid #e4e4ec;padding:26px 0 44px;color:var(--gray);font-size:13.5px}
+.card-head{background:var(--offblack);color:#fff;padding:16px 20px;font-weight:700;font-size:16.5px;display:flex;align-items:center;gap:10px;line-height:1.25}
+.card-body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
+.card-body p{color:var(--gray);font-size:14.5px}
+.tags{margin:14px 0 0;display:flex;gap:7px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--offwhite);border:1px solid #dcdce5;color:var(--gray);border-radius:20px;padding:4px 10px}
+.go{margin-top:16px;font-weight:700;color:var(--blue);font-size:14.5px}
+.how{margin-top:44px;background:#fff;border:1px solid #ececf3;border-left:5px solid var(--accent);border-radius:10px;padding:20px 22px}
+.how h3{font-size:16px;margin-bottom:8px}
+.how p{color:var(--gray);font-size:14.5px}
+footer{border-top:1px solid #e4e4ec;padding:24px 0 44px;color:var(--gray);font-size:13.5px}
 footer a{color:var(--blue)}
 </style>
 </head>
@@ -35,8 +39,8 @@ footer a{color:var(--blue)}
 <header>
   <div class="wrap">
     <div class="wordmark">Power Platform Learning</div>
-    <h1>Interactive guides for Microsoft&nbsp;Power&nbsp;Platform decisions</h1>
-    <p>Short decision wizards that give you the answer first, with the full reference tables underneath. Each guide is a single self-contained page: nothing to install, works offline once loaded.</p>
+    <h1>Interactive guides for Power Platform and Copilot decisions</h1>
+    <p>Each guide asks a few questions, gives you the answer, and puts the full reference tables underneath. One self-contained page, nothing to install, works offline once loaded.</p>
   </div>
 </header>
 
@@ -46,16 +50,29 @@ footer a{color:var(--blue)}
     <a class="card" href="power-platform-environments.html">
       <div class="card-head"><span>&#128187;</span> Developer vs Sandbox vs Production</div>
       <div class="card-body">
-        <p>Answer up to three questions about who will use an environment and what it must do, and get routed to the right environment type, with the licensing, capacity, backup and copy/restore consequences of that choice.</p>
-        <div class="tags"><span class="tag">Environments</span><span class="tag">ALM</span><span class="tag">Licensing</span><span class="tag">Dataverse</span></div>
+        <p>Which environment type to use, and what that choice means for licensing, capacity, backup retention and whether you can copy or restore into it.</p>
+        <div class="tags"><span class="tag">Environments</span><span class="tag">ALM</span><span class="tag">Dataverse</span></div>
+        <div class="go">Open the guide &rarr;</div>
+      </div>
+    </a>
+    <a class="card" href="m365-copilot-credits.html">
+      <div class="card-head"><span>&#128178;</span> Included vs Copilot Credits</div>
+      <div class="card-body">
+        <p>When agent activity is covered by a Microsoft 365 Copilot licence and when it consumes Copilot Credits, with the published per-feature credit rates and the enforcement rules.</p>
+        <div class="tags"><span class="tag">Copilot Studio</span><span class="tag">Licensing</span><span class="tag">Credits</span></div>
         <div class="go">Open the guide &rarr;</div>
       </div>
     </a>
   </div>
+
+  <div class="how">
+    <h3>How these are built</h3>
+    <p>Each guide is a single HTML file with inline CSS and JavaScript and no external requests, so it renders the same from a web server, a file share or a local download. Content is compiled from Microsoft Learn and every guide carries its sources and verification date in the footer.</p>
+  </div>
 </main>
 
 <footer class="wrap">
-  Built from Microsoft Learn documentation, verified August 2026. Microsoft changes limits and licensing terms often, so confirm anything cost-related against current documentation before you commit to a design.
+  Compiled from Microsoft Learn documentation. Microsoft changes limits, rates and licensing terms often, so confirm anything cost-related against current documentation before you commit to a design.
   More writing at <a href="https://soundharyasubhash.wordpress.com/">Power Platform Learning</a>.
 </footer>
 </body>
