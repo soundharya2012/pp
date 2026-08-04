@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Microsoft 365 Copilot: included vs Copilot Credits</title>
+<title>Copilot Credits: what is included and what you pay for</title>
 <style>
 
 :root{
@@ -199,224 +199,313 @@ footer{background:var(--white);border-top:1px solid #ececf3;padding:40px 24px;}
    ===================================================================== */
 /* CONFIG-START */
 // PUBLIC EDITION - no internal references, no brand assets.
-// Every rate and rule below is from Microsoft Learn, checked 4 Aug 2026:
-//   microsoft-copilot-studio/requirements-messages-management  (billing rates + footnotes 1-4)
-//   microsoft-copilot-studio/billing-licensing                 (what an M365 Copilot licence includes)
-//   ai-builder/licensing-prompt-tokens                         (prompts outside agents)
-// Build:  .\build.ps1 -Config .\sites\copilot-credits-public.js -NoBrand -HomeUrl "index.html"
+// Sources, all public, checked 4 Aug 2026:
+//   Microsoft Copilot Credits Guide, August 2026 (PDF, aka.ms product docs CDN)
+//   learn: microsoft-copilot-studio/harnesses-overview
+//   learn: microsoft-copilot-studio/agents-experience/billing-credit-overview   (GitHub Copilot harness)
+//   learn: microsoft-copilot-studio/requirements-messages-management            (standard harness rates)
+//   learn: microsoft-copilot-studio/billing-licensing                           (what the M365 Copilot USL covers)
+// Build: .\build.ps1 -Config .\sites\copilot-credits-public.js -NoBrand -HomeUrl "index.html"
 const CONFIG = {
-  title: 'Microsoft 365 Copilot: included vs Copilot Credits',
+  title: 'Copilot Credits: what is included and what you pay for',
   eyebrow: 'Licensing decision guide',
-  h1: 'Microsoft 365 Copilot:<br><span class="hl">included</span> vs when <span class="hl">Copilot Credits</span> are consumed',
-  sub: 'Answer up to three questions about your scenario and this guide routes you straight to the answer, then shows the exact credit rate that applies if the activity is billable.',
+  h1: 'Copilot Credits:<br>what your licence <span class="hl">covers</span>, and what you <span class="hl">pay for</span>',
+  sub: 'Since the harness split, the answer depends on what you built as much as who is using it. Answer up to three questions and this guide routes you to the rule and the credit range that applies.',
   ctas: [
     {label:'Start the guide &nbsp;&rarr;', href:'#decide', style:'btn-primary'},
     {label:'Browse the rates and rules', href:'#reference', style:'btn-ghost'}
   ],
   stats: [
-    {k:'Included', v:'Licensed employee, agent runs as their identity'},
-    {k:'Billable', v:'External, unlicensed, autonomous, CUA'},
-    {k:'Currency', v:'Copilot Credits, replaced messages Sept 2025'},
-    {k:'Enforcement', v:'Agents disabled at 125% of prepaid capacity'}
+    {k:'Harness first', v:'GitHub Copilot harness has no B2E inclusion'},
+    {k:'Standard harness', v:'Licensed employee, own identity, still free'},
+    {k:'Price', v:'$0.01 per credit pay-as-you-go, pooled per tenant'},
+    {k:'New in 2026', v:'Building an agent can consume credits too'}
   ],
-  wizardTitle: 'Is my scenario included or billable?',
+  wizardTitle: 'Is this included, or does it burn credits?',
   steps: 3,
 
   nodes: {
-    q1:{step:1, q:'Who is interacting with the agent?', options:[
-      {l:'An employee licensed for Microsoft 365 Copilot', c:'Interactive, authenticated under their own identity', go:'q2'},
+    q1:{step:1, q:'What are you building or using?', options:[
+      {l:'A rule-based agent or agent flow', c:'Topics, prompts and paths you define - the standard harness', go:'q2'},
+      {l:'An extension of Microsoft 365 Copilot Chat', c:'Your knowledge surfaced in Copilot Chat - the Copilot chat harness', go:'q2'},
+      {l:'An agentic, multi-step agent or workflow', c:'Reasons through a goal, handles files, uses skills and memory - the GitHub Copilot harness', go:'r_ghc'},
+      {l:'Copilot Cowork', c:'Describe an outcome and it does the work autonomously', go:'r_cowork'},
+      {l:'Work IQ APIs in my own solution', c:'Calling Work IQ from an agent or app you built', go:'r_workiq'},
+      {l:'AI features in a Power App or a cloud flow', c:'Prompts, summarisation, embedded agents', go:'r_bizapps'},
+      {l:'A Dynamics 365 agent', c:'Prebuilt or custom', go:'r_d365'}
+    ]},
+    q2:{step:2, q:'Who is interacting with it?', options:[
+      {l:'An employee licensed for Microsoft 365 Copilot', c:'Interactive, authenticated, under their own identity', go:'q3'},
       {l:'An internal user without an M365 Copilot licence', c:'A colleague who is not licensed', go:'cr_unlic'},
       {l:'An external person or customer', c:'A customer-facing agent', go:'cr_ext'},
       {l:'Nobody. It runs autonomously', c:'Event-triggered or scheduled, no interactive user', go:'cr_auto'}
     ]},
-    q2:{step:2, q:'What is the licensed employee actually using?', options:[
-      {l:'Chatting with an agent', c:'In Microsoft 365 Copilot Chat, Teams or SharePoint', go:'inc_chat'},
-      {l:'Answers, agent actions or tenant graph grounding', c:'Classic or generative answers, triggers, deep reasoning, RAG over Graph', go:'inc_core'},
-      {l:'AI tools or prompts inside the agent', c:'Text and generative AI tools invoked by the agent', go:'inc_aitools'},
+    q3:{step:3, q:'What is that licensed employee using?', options:[
+      {l:'Chat, answers or tenant graph grounding', c:'Classic or generative answers, agent actions, RAG over Graph', go:'inc_core'},
+      {l:'AI tools or prompts inside the agent', c:'Text and generative AI tools the agent invokes', go:'inc_aitools'},
+      {l:'An agent flow via "When an agent calls the flow"', c:'The agent invokes the flow directly', go:'inc_flow'},
+      {l:'An agent flow via any other trigger', c:'Scheduled, event-based, manual or connector-based', go:'cr_flow'},
       {l:'A Computer-Using Agent', c:'An agent that operates a computer interface', go:'cr_cua'},
-      {l:'An agent flow', c:'A flow the agent runs', go:'q3'},
-      {l:'A prompt in a standalone app or cloud flow', c:'Outside a Copilot Studio agent', go:'standalone'},
-      {l:'Testing or training', c:'Test panel, test chat, flow designer test runs', go:'free_testing'}
-    ]},
-    q3:{step:3, q:'Which trigger starts the agent flow?', options:[
-      {l:'"When an agent calls the flow"', c:'The agent invokes the flow directly', go:'inc_flow'},
-      {l:'Any other trigger', c:'Scheduled, event-based, manual or connector-based', go:'cr_flow'}
+      {l:'A prompt in a standalone app or cloud flow', c:'Outside the agent', go:'standalone'},
+      {l:'Testing or evaluating', c:'Test panel, test chat, flow designer test runs', go:'free_testing'}
     ]}
   },
 
   results: {
-    inc_chat:{type:'good', verdict:'Included, no charge', title:'Covered by the Microsoft 365 Copilot licence',
-      lead:'Using agents in Copilot Chat, Teams or SharePoint for classic answers, generative answers or tenant graph grounding is zero-rated for licensed users.',
+    r_ghc:{type:'bad', verdict:'Credits, from the moment you build', title:'GitHub Copilot harness: usage-based, no licence inclusion',
+      lead:'This is the big change. The most capable harness is billed purely on consumption, and the Microsoft 365 Copilot inclusion that covers the other two harnesses does not apply here.',
       facts:[
-        ['Why','Employee-facing (B2E) usage is included in the M365 Copilot USL when the user is licensed and the agent runs under their authenticated identity.'],
-        ['Also included','Copilot Chat with Pages, Copilot in Microsoft 365 apps, SharePoint agents, Copilot Analytics.'],
-        ['Condition','Subject to fair-usage limits, which Microsoft may change.']
+        ['No B2E inclusion','A fully licensed employee using one of these agents still consumes credits.'],
+        ['Billing starts at build','Unlike the standard harness, which bills after publish, this one charges from the moment you start building.'],
+        ['Authoring cost','Natural language authoring: 1-20 credits for 1-2 conversation turns, 21-60 for 3-5 turns, 61+ for 6 or more.'],
+        ['Free while building','Manual configuration costs nothing, including everything in the Build and Monitor tabs.'],
+        ['Preview and evaluation','Billed at runtime rates, so testing a heavy agent is not cheap.'],
+        ['Runtime per task','Light 100-300 credits, medium 300-500, heavy over 500. At $0.01 per credit a heavy task exceeds $5.'],
+        ['What credits cover','LLM tokens, tools including knowledge and MCP, and the harness runtime itself.'],
+        ['Cost drivers','Models, runtime, context and tools. Design choices move the bill more than user counts do.']
       ], note:true},
 
-    inc_core:{type:'good', verdict:'Included, no charge', title:'Answers, agent actions and graph grounding are covered',
-      lead:'For a licensed employee these are all zero-rated, even though each carries a credit rate for everyone else.',
+    r_cowork:{type:'bad', verdict:'Credits, licence is only a prerequisite', title:'Copilot Cowork is billed on usage',
+      lead:'Cowork requires a Microsoft 365 Copilot licence before you can use it, but the subscription includes no Cowork entitlement whatsoever.',
+      facts:[
+        ['Prerequisite','An M365 Copilot licence is required, and grants no included Cowork usage.'],
+        ['Light task','100-300 credits. Few sources, light reasoning, one short deliverable.'],
+        ['Medium task','300-700 credits. Many sources, structured reasoning, two or more outputs.'],
+        ['Heavy task','Over 700 credits. Broad aggregation, deep reasoning, many outputs.'],
+        ['Cost drivers','Models, runtime, context and tools, same four buckets as the agentic harness.'],
+        ['How to forecast','Size users by persona, estimate prompts per persona across light/medium/heavy, apply an average price per prompt.']
+      ], note:false},
+
+    r_workiq:{type:'warn', verdict:'Credits, not an entitlement', title:'Work IQ APIs are billed separately',
+      lead:'Work IQ APIs can be called on behalf of any Microsoft 365 user from any platform, and that usage is never covered by the Copilot licence.',
+      facts:[
+        ['Tools API','A flat 0.1 credit per API call for actions and tools.'],
+        ['Chat and Context API','Variable, driven by models, runtime, context and tools.'],
+        ['Not an entitlement','Work IQ APIs are explicitly not included in the M365 Copilot licence.'],
+        ['Inside M365 Copilot','No incremental charge. Chat, the AI features in Word, Excel and PowerPoint, and Researcher, Analyst and Facilitator are all built natively on Work IQ.'],
+        ['Older APIs','Retrieval API and Chat API licensing is unchanged, and licensed users are not charged for them.'],
+        ['Efficiency angle','Shifting processing into the Work IQ runtime can cut context and tool tokens by up to 80%, which lowers credit burn.']
+      ], note:false},
+
+    r_bizapps:{type:'warn', verdict:'Credits only when AI runs', title:'Power Apps and Power Automate: only the AI part bills',
+      lead:'Ordinary app and flow usage is covered by Power Platform licensing. Credits enter the picture only when AI or agentic functionality is actually invoked.',
+      facts:[
+        ['Triggers a charge','Interacting with a Copilot Studio agent embedded in an app or workflow.'],
+        ['Triggers a charge','Using AI tools, prompts or generative capabilities such as summarisation, data exploration or document processing.'],
+        ['Triggers a charge','Running AI tools or Copilot-assisted features once included entitlements are exceeded.'],
+        ['Does not','A plain cloud flow with no AI uses Power Automate licensing and never consumes Copilot Credits.']
+      ], note:false},
+
+    r_d365:{type:'warn', verdict:'Credits consumed', title:'Dynamics 365 agents consume credits',
+      lead:'Both prebuilt and custom Dynamics 365 agents draw on Copilot Credits.',
+      facts:[
+        ['Scope','Prebuilt and custom agents alike.'],
+        ['Pooling','Credits pool at tenant level, so allocate them to environments or one workload can drain the pool.'],
+        ['Detail','The Dynamics 365 licensing guide carries the per-scenario specifics.']
+      ], note:false},
+
+    inc_core:{type:'good', verdict:'Included, no charge', title:'Covered by the Microsoft 365 Copilot licence',
+      lead:'On the standard and Copilot chat harnesses, employee-facing usage by a licensed user under their own identity is zero-rated.',
       facts:[
         ['Classic answer','1 credit normally, no charge for a licensed user.'],
-        ['Generative answer','2 credits normally, no charge for a licensed user.'],
-        ['Agent action','5 credits normally. Covers triggers, deep reasoning and topic transitions.'],
+        ['Generative answer','2 credits normally, no charge.'],
+        ['Agent action','5 credits normally. Triggers, deep reasoning, topic transitions.'],
         ['Tenant graph grounding','10 credits normally. RAG over your tenant-wide Microsoft Graph.'],
-        ['Excluded','Computer-Using Agents, which are billed at the agent action rate and are not in the USL.'],
-        ['Reasoning models','A reasoning model adds the premium AI tools rate on top of the feature rate, per 1,000 tokens.']
+        ['Also in the licence','Copilot Chat including Pages, Copilot in Microsoft 365 apps, SharePoint agents, Work IQ grounding, Researcher, Analyst and Facilitator.'],
+        ['Excluded','Computer-Using Agents, billed at the agent action rate.'],
+        ['Reasoning models','Add the premium AI tools rate on top of the feature rate, per 1,000 tokens.'],
+        ['Condition','Fair-usage limits apply and Microsoft may change them.']
       ], note:true},
 
     inc_aitools:{type:'good', verdict:'Included, no charge', title:'AI tools inside the agent are covered',
-      lead:'Text and generative AI tools invoked by an agent are zero-rated when a licensed employee drives them.',
+      lead:'Text and generative AI tools invoked by a standard-harness agent are zero-rated when a licensed employee drives them.',
       facts:[
         ['Basic tools','1 credit per 10 responses, or 0.1 credit per 1K tokens.'],
         ['Standard tools','15 credits per 10 responses, or 1.5 credits per 1K tokens.'],
-        ['Premium tools','100 credits per 10 responses, or 10 credits per 1K tokens. This is also what advanced reasoning bills as.'],
+        ['Premium tools','100 credits per 10 responses, or 10 credits per 1K tokens. Advanced reasoning bills here.'],
         ['Content processing','8 credits per page.'],
         ['Condition','Zero-rated only for a licensed user under their own identity, within fair usage.']
       ], note:true},
 
     inc_flow:{type:'good', verdict:'Included, no charge', title:'This is the one free agent-flow trigger',
-      lead:'Agent flow actions are included at no charge for a licensed user, but only through the "When an agent calls the flow" trigger.',
+      lead:'Agent flow actions are included for a licensed user, but only through the "When an agent calls the flow" trigger.',
       facts:[
         ['Rate otherwise','13 credits per 100 agent flow actions.'],
-        ['Enforcement','These runs do not consume credits and are exempt from agent flow enforcement.'],
-        ['Any other trigger','Consumes credits at the standard rate, even for a licensed user.']
+        ['Enforcement','These runs consume no credits and are exempt from agent flow enforcement.'],
+        ['Any other trigger','Bills at the standard rate, even for a licensed user.']
       ], note:true},
 
-    free_testing:{type:'info', verdict:'Always free', title:'Testing does not consume capacity',
-      lead:'Testing an agent or an agent flow is free, and test runs are never blocked by enforcement.',
+    free_testing:{type:'info', verdict:'Free on the standard harness only', title:'Where testing is free, and where it is not',
+      lead:'Testing costs nothing on the standard harness. On the GitHub Copilot harness, preview and evaluation bill at runtime rates.',
       facts:[
-        ['Covers','The agent test chat panel and testing an agent flow in the flow designer.'],
-        ['Who','Any maker, no licence condition.'],
-        ['Note','A trial licence lets you build and test agents but not publish them.']
+        ['Free','Agent test chat panel and testing an agent flow in the flow designer, never blocked by enforcement.'],
+        ['Not free','Preview, evaluation and natural language authoring on the GitHub Copilot harness.'],
+        ['Trial licence','Lets you build and test agents, but not publish them.']
       ], note:false},
 
-    standalone:{type:'warn', verdict:'Different licence applies', title:'Prompts outside an agent are not covered by the Copilot USL',
-      lead:'A prompt running in a standalone app or a cloud flow sits outside the agent, so the M365 Copilot inclusion does not apply.',
+    standalone:{type:'warn', verdict:'Different licence applies', title:'A prompt outside the agent is not covered',
+      lead:'Move a prompt out of an agent and into a standalone app or cloud flow, and the Copilot inclusion stops applying.',
       facts:[
         ['What applies','AI Builder prompt licensing and prompt token metering, not the M365 Copilot USL.'],
-        ['Plain cloud flows','Power Automate cloud flows use Power Automate licensing and never consume Copilot Credits.'],
-        ['Why it matters','Moving a prompt out of an agent into a flow silently changes which meter it bills against.']
+        ['Plain cloud flows','Power Automate licensing, never Copilot Credits.'],
+        ['Why it matters','The same prompt changes meter depending on where it runs.']
       ], note:false},
 
-    cr_cua:{type:'bad', verdict:'Copilot Credits consumed', title:'Computer-Using Agents are excluded',
-      lead:'Computer-Using Agent usage is explicitly not included in the Microsoft 365 Copilot licence.',
+    cr_cua:{type:'bad', verdict:'Credits consumed', title:'Computer-Using Agents are excluded',
+      lead:'Computer-Using Agent usage is explicitly outside the Microsoft 365 Copilot licence.',
       facts:[
         ['Rate','Billed at the agent action rate, 5 credits.'],
-        ['Applies to','Every user, including a fully licensed employee.']
+        ['Applies to','Everyone, including a fully licensed employee.']
       ], note:false},
 
-    cr_flow:{type:'bad', verdict:'Copilot Credits consumed', title:'This agent-flow trigger is billable',
-      lead:'Only the "When an agent calls the flow" trigger carries the no-charge inclusion. Every other trigger bills.',
+    cr_flow:{type:'bad', verdict:'Credits consumed', title:'This agent-flow trigger is billable',
+      lead:'Only "When an agent calls the flow" carries the inclusion. Every other trigger bills.',
       facts:[
         ['Rate','13 credits per 100 agent flow actions.'],
-        ['Applies to','Every user, including a licensed employee.'],
-        ['Enforcement','When prepaid capacity is exhausted, new agent flow runs are blocked while the agent keeps answering.']
+        ['Applies to','Everyone, including a licensed employee.'],
+        ['Enforcement','Once prepaid capacity is exhausted, new agent flow runs are blocked while the agent keeps answering.']
       ], note:false},
 
-    cr_unlic:{type:'bad', verdict:'Copilot Credits consumed', title:'Unlicensed internal user',
-      lead:'Without an M365 Copilot licence there is nothing to zero-rate the usage against, so every interaction bills.',
+    cr_unlic:{type:'bad', verdict:'Credits consumed', title:'Unlicensed internal user',
+      lead:'With no M365 Copilot licence there is nothing to zero-rate against, so every interaction bills at the published rates.',
       facts:[
-        ['Rates','1 credit classic answer, 2 generative answer, 5 agent action, 10 tenant graph grounding.'],
-        ['Worked example','An agent using 4 generative answers plus 4 graph-grounded responses costs 48 credits per user per day; Microsoft counts only the unlicensed users.']
+        ['Rates','1 classic answer, 2 generative answer, 5 agent action, 10 tenant graph grounding.'],
+        ['Worked example','4 generative answers plus 4 graph-grounded responses is 48 credits per user per day. Microsoft counts only the unlicensed users.']
       ], note:false},
 
-    cr_ext:{type:'bad', verdict:'Copilot Credits consumed', title:'External or customer-facing agent',
-      lead:'The inclusion covers employee-facing usage only, so a customer-facing agent is always billable.',
+    cr_ext:{type:'bad', verdict:'Credits consumed', title:'External or customer-facing agent',
+      lead:'The inclusion is employee-facing only, so a customer-facing agent always bills.',
       facts:[
-        ['Rates','Same per-feature rates apply to every interaction.'],
-        ['Worked example','4 classic answers plus 2 generative answers for 900 customers a day is 7,200 credits a day.'],
-        ['Voice','Voice adds a per-minute rate: 10 credits classic, 35 GenAI, 75 premium GenAI, with core agent activity included.']
+        ['Worked example','4 classic answers plus 2 generative answers for 900 customers a day is 7,200 credits daily, about $72 at pay-as-you-go.'],
+        ['Voice','Adds a per-minute rate: 10 credits classic, 35 GenAI, 75 premium GenAI, with core agent activity included.']
       ], note:false},
 
-    cr_auto:{type:'bad', verdict:'Copilot Credits consumed', title:'Autonomous or event-triggered agent',
+    cr_auto:{type:'bad', verdict:'Credits consumed', title:'Autonomous or event-triggered agent',
       lead:'With no interactive licensed identity behind the run, there is nothing for the licence to cover.',
       facts:[
-        ['Why','The inclusion requires the agent to operate under an authenticated licensed user identity.'],
-        ['Worked example','An order-processing agent firing 4 agent actions per order costs 20 credits per run.'],
-        ['Internal or not','It makes no difference that the agent is internal-facing.']
+        ['Why','The inclusion requires the agent to run under an authenticated licensed user identity.'],
+        ['Worked example','An order-processing agent firing 4 agent actions per order is 20 credits per run on the standard harness.'],
+        ['Internal or not','Being internal-facing makes no difference.']
       ], note:false}
   },
-  noteText: '<b>Fair usage still applies.</b> Included capabilities are subject to fair-usage limits, and Microsoft reserves the right to update those limits as new usage patterns emerge.',
+  noteText: '<b>Two rules to hold together.</b> On the standard and Copilot chat harnesses, employee-facing usage by a licensed user is included within fair-usage limits. On the GitHub Copilot harness, on Cowork and on Work IQ APIs there is no inclusion at all, and on that harness the meter starts running while you are still building.',
 
   refKicker: 'Full reference',
-  refHeading: 'Rates, inclusions and enforcement',
-  refIntro: 'The published credit rates, what the Microsoft 365 Copilot licence covers, and what happens when you run out of capacity.',
+  refHeading: 'Harnesses, rates, prices and enforcement',
+  refIntro: 'The published rates and rules, drawn from the Microsoft Copilot Credits Guide of August 2026 and the Copilot Studio documentation.',
   cards: [
-    {wide:true, head:'dark', icon:'&#128178;', title:'Published credit rates', sub:'Per feature, and what a licensed employee pays',
-      columns:['Agent feature','Rate','M365 Copilot licensed user'],
+    {wide:true, head:'dark', icon:'&#9881;', title:'The harness decides the billing model', sub:'Copilot Studio now runs three, and they do not bill alike',
+      columns:['Consideration','GitHub Copilot harness','Standard harness','Copilot chat harness'],
       rows:[
-        ['Classic answer','1 credit','<span class="pill pill-good">No charge</span>'],
-        ['Generative answer','2 credits','<span class="pill pill-good">No charge</span>'],
-        ['Agent action (triggers, deep reasoning, topic transitions)','5 credits','<span class="pill pill-good">No charge</span>'],
-        ['Tenant graph grounding','10 credits','<span class="pill pill-good">No charge</span>'],
-        ['Agent flow actions, per 100','13 credits','<span class="pill pill-warn">Only via the agent-calls-flow trigger</span>'],
-        ['AI tools, basic, per 10 responses','1 credit','<span class="pill pill-good">No charge</span>'],
-        ['AI tools, standard, per 10 responses','15 credits','<span class="pill pill-good">No charge</span>'],
-        ['AI tools, premium, per 10 responses','100 credits','<span class="pill pill-good">No charge</span>'],
-        ['Content processing, per page','8 credits','<span class="pill pill-good">No charge</span>'],
-        ['Computer-Using Agent','5 credits (agent action rate)','<span class="pill pill-bad">Not included</span>'],
-        ['Voice, classic orchestration, per minute','10 credits','Core agent activity included'],
-        ['Voice, GenAI, per minute','35 credits','Core agent activity included'],
-        ['Voice, premium GenAI, per minute','75 credits','Core agent activity included']
+        ['Best for','Complex multi-step business processes','Rule-based agents and structured conversations','Extending M365 Copilot Chat with your knowledge'],
+        ['How it works','Reasons through a goal step by step','Follows the topics and rules you define','Connects enterprise knowledge to Copilot Chat'],
+        ['Billing','<span class="pill pill-bad">Usage-based credits</span>','<span class="pill pill-warn">Per-feature credits</span>','<span class="pill pill-warn">Consumption or USL</span>'],
+        ['B2E inclusion for licensed users','<span class="pill pill-bad">None</span>','<span class="pill pill-good">Yes</span>','<span class="pill pill-good">Yes</span>'],
+        ['Billing starts','<span class="pill pill-bad">When you start building</span>','After publish','After publish'],
+        ['Files','Creates and edits Word, Excel, PowerPoint, PDF','Not a focus','Not a focus'],
+        ['Skills and memory','<span class="pill pill-good">Yes</span>','Not a focus','Not a focus'],
+        ['Recovery','Retries and finds alternative paths','Follows the paths you built','Not a focus'],
+        ['Publishing','Internal or external','Internal or external','Internal teams']
       ]},
 
-    {head:'good', icon:'&#10003;', title:'What the licence includes', sub:'Employee-facing usage, licensed user, own identity',
-      columns:['Included','Condition'],
+    {wide:true, head:'bad', icon:'&#9889;', title:'GitHub Copilot harness: what it costs', sub:'Credits cover LLM tokens, tools including knowledge and MCP, and the harness itself',
+      columns:['Activity','Scenario','Estimated credits'],
       rows:[
-        ['Agents in Copilot Chat, Teams and SharePoint','Classic answers, generative answers, tenant graph grounding are zero-rated'],
-        ['Microsoft 365 Copilot Chat, including Pages','Part of the licence'],
-        ['Copilot in Microsoft 365 apps, including Teams','Part of the licence'],
-        ['SharePoint agents','Part of the licence'],
-        ['Agent capabilities built in Copilot Studio','When used in M365 Copilot, Teams or SharePoint'],
-        ['Agent flow actions','<span class="pill pill-warn">Only</span> via the "When an agent calls the flow" trigger'],
-        ['Copilot Analytics and SharePoint Advanced Management','Part of the licence'],
-        ['Testing agents and agent flows','<span class="pill pill-good">Always free</span>, and exempt from enforcement']
+        ['Natural language authoring','Light, 1-2 conversation turns','1-20'],
+        ['Natural language authoring','Medium, 3-5 conversation turns','21-60'],
+        ['Natural language authoring','Heavy, 6 or more turns','61+'],
+        ['Manual configuration','Build and Monitor tabs','<span class="pill pill-good">No charge</span>'],
+        ['Preview and evaluation','Any','Equivalent to runtime usage'],
+        ['Runtime','Light: few sources, light reasoning, one output','100-300'],
+        ['Runtime','Medium: many sources, structured reasoning, 2+ outputs','300-500'],
+        ['Runtime','Heavy: broad aggregation, deep reasoning, many outputs','over 500'],
+        ['Cost drivers','Models, runtime, context, tools','Design decides the bill'],
+        ['At pay-as-you-go','$0.01 per credit','A heavy task is over $5 per run']
       ]},
 
-    {head:'bad', icon:'&#9889;', title:'What consumes credits', sub:'No inclusion applies',
+    {wide:true, head:'info', icon:'&#128101;', title:'Copilot Cowork and Work IQ APIs', sub:'Both sit outside the Microsoft 365 Copilot entitlement',
+      columns:['Item','Rule','Credits'],
+      rows:[
+        ['Cowork prerequisite','An M365 Copilot licence is required','No Cowork entitlement is included'],
+        ['Cowork light task','Few sources, light reasoning, one short deliverable','100-300'],
+        ['Cowork medium task','Many sources, structured reasoning, 2+ outputs','300-700'],
+        ['Cowork heavy task','Broad aggregation, deep reasoning, many outputs','over 700'],
+        ['Work IQ Tools API','Static charge for actions and tools','0.1 per API call'],
+        ['Work IQ Chat or Context API','Variable, query-style consumption','Driven by models, runtime, context, tools'],
+        ['Work IQ inside M365 Copilot','Chat, Word, Excel, PowerPoint, Researcher, Analyst, Facilitator','<span class="pill pill-good">No incremental charge</span>'],
+        ['Older Retrieval and Chat APIs','Licensing unchanged','<span class="pill pill-good">Not charged for licensed users</span>'],
+        ['Work IQ efficiency','Shifting processing into the runtime cuts context and tool tokens','Up to 80% fewer tokens']
+      ]},
+
+    {head:'dark', icon:'&#128178;', title:'Standard harness rates', sub:'Per feature, and what a licensed employee pays',
+      columns:['Feature','Rate','Licensed user'],
+      rows:[
+        ['Classic answer','1','<span class="pill pill-good">Free</span>'],
+        ['Generative answer','2','<span class="pill pill-good">Free</span>'],
+        ['Agent action','5','<span class="pill pill-good">Free</span>'],
+        ['Tenant graph grounding','10','<span class="pill pill-good">Free</span>'],
+        ['Agent flow actions, per 100','13','<span class="pill pill-warn">One trigger only</span>'],
+        ['AI tools basic, per 10 responses','1','<span class="pill pill-good">Free</span>'],
+        ['AI tools standard, per 10 responses','15','<span class="pill pill-good">Free</span>'],
+        ['AI tools premium, per 10 responses','100','<span class="pill pill-good">Free</span>'],
+        ['Content processing, per page','8','<span class="pill pill-good">Free</span>'],
+        ['Computer-Using Agent','5','<span class="pill pill-bad">Not included</span>'],
+        ['Voice classic, per minute','10','Core activity included'],
+        ['Voice GenAI, per minute','35','Core activity included'],
+        ['Voice premium GenAI, per minute','75','Core activity included']
+      ]},
+
+    {head:'bad', icon:'&#128465;', title:'What always consumes credits', sub:'No inclusion applies anywhere here',
       columns:['Scenario','Why'],
       rows:[
+        ['Anything on the GitHub Copilot harness','Usage-based by design, including build time'],
+        ['Copilot Cowork','Licence is a prerequisite, not an entitlement'],
+        ['Work IQ APIs in your own solutions','Explicitly not an entitlement'],
         ['External or customer-facing agents','The inclusion is employee-facing only'],
-        ['Unlicensed internal users','No M365 Copilot licence to zero-rate against'],
-        ['Autonomous or event-triggered runs','No authenticated licensed user identity behind the run'],
+        ['Unlicensed internal users','No licence to zero-rate against'],
+        ['Autonomous or event-triggered runs','No authenticated licensed identity'],
         ['Computer-Using Agents','Explicitly excluded from the licence'],
         ['Agent flows on any other trigger','Only one trigger carries the inclusion'],
-        ['Prompts in standalone apps or cloud flows','AI Builder prompt licensing applies instead'],
-        ['Usage beyond fair-usage limits','The inclusion is bounded by fair usage'],
-        ['Bring-your-own-model, including Azure Foundry','Billed separately from Copilot Studio rates']
+        ['Dynamics 365 agents','Prebuilt and custom alike'],
+        ['Usage beyond fair-usage limits','The inclusion is bounded'],
+        ['Bring-your-own-model, including Azure Foundry','Billed separately']
       ]},
 
-    {wide:true, head:'warn', icon:'&#9888;', title:'Capacity and enforcement', sub:'What happens when the credits run out',
+    {wide:true, head:'good', icon:'&#128181;', title:'What credits cost and how you buy them', sub:'Pooled at tenant level, managed centrally',
+      columns:['Option','Detail','Commercial note'],
+      rows:[
+        ['Pay-as-you-go meter','$0.01 per credit, billed in arrears each month','No up-front commitment, no interruption on overage'],
+        ['Pre-Purchase Plan (P3)','One-year pay-upfront pool, tiered discounts','Unused credits expire at the end of the annual term'],
+        ['P3 tier 1','300,000 credits','5% discount'],
+        ['P3 tier 3','3,000,000 credits','7%'],
+        ['P3 tier 5','30,000,000 credits','10%'],
+        ['P3 tier 7','150,000,000 credits','14%'],
+        ['P3 tier 9','300,000,000 credits','20%'],
+        ['MACC','Both pay-as-you-go and P3 decrement the Azure Consumption Commitment','Useful if you already hold a MACC'],
+        ['Pooling','Credits pool at tenant level across all workloads','Allocate to environments or one workload drains the pool'],
+        ['Governance','Microsoft 365 admin center: spend policies, thresholds, allocation','Power Platform admin center for Copilot Studio detail and per-agent caps'],
+        ['Where to buy','CSP partner, Microsoft Sales Online, or directly online','Pay-as-you-go in PPAC, P3 in the Azure portal']
+      ]},
+
+    {wide:true, head:'warn', icon:'&#9888;', title:'Capacity and enforcement', sub:'Standard harness behaviour when credits run out',
       columns:['Rule','Detail'],
       rows:[
-        ['Pooling','Purchased credits are pooled across the tenant and can be allocated per environment.'],
-        ['No rollover','Capacity is enforced monthly and unused credits do not carry over.'],
+        ['No rollover','Capacity is enforced monthly and unused prepaid credits do not carry over.'],
         ['Overage grace','Some overage is allowed rather than blocking business processes immediately.'],
         ['Agent enforcement','At 125% of prepaid capacity custom agents are disabled. In-flight conversations finish; new invocations are rejected.'],
         ['What users see','"There is a billing issue" or "This agent is currently unavailable. It has reached its usage limit."'],
         ['Agent flow enforcement','Once prepaid capacity is fully consumed, new agent flow runs are blocked but the agent keeps answering.'],
-        ['Exemptions','Runs by licensed users via the agent-calls-flow trigger, and test runs.'],
+        ['Exemptions','Runs by licensed users through the agent-calls-flow trigger, and test runs.'],
         ['Ways out','Reallocate capacity, buy more credits, or link an Azure subscription for pay-as-you-go, which removes enforcement.'],
-        ['Per-agent caps','Monthly consumption limits can be set per agent in the Power Platform admin center.'],
-        ['Ways to buy','Pay-as-you-go via Azure, prepaid credit packs, or a one-year prepurchase of commit units.']
-      ]},
-
-    {wide:true, head:'info', icon:'&#9881;', title:'Same capability, different cost by context', sub:'Where a prompt or flow runs decides the meter',
-      columns:['Where it runs','Who uses it','Cost'],
-      rows:[
-        ['Inside a Copilot Studio agent','Licensed employee, own identity','<span class="pill pill-good">No charge</span>'],
-        ['Inside a Copilot Studio agent','Unlicensed, external or autonomous','<span class="pill pill-bad">Copilot Credits</span>'],
-        ['Standalone app or cloud flow prompt','Anyone','<span class="pill pill-warn">AI Builder prompt licensing</span>'],
-        ['Agent flow, "When an agent calls the flow"','Licensed employee','<span class="pill pill-good">No charge</span>'],
-        ['Agent flow, any other trigger','Anyone, including licensed','<span class="pill pill-bad">Copilot Credits</span>'],
-        ['Plain Power Automate cloud flow, no AI','Anyone','<span class="pill pill-good">Power Automate licensing</span>']
+        ['Per-agent caps','Set monthly consumption limits per agent in the Power Platform admin center before enforcement bites.'],
+        ['Where to watch','Agent Monitor page in Copilot Studio, and Licensing then Copilot Studio in the admin center.']
       ]}
   ],
 
   rule:{icon:'&#128161;', title:'Rule of thumb',
-    text:'If a <b>licensed employee</b> is interacting with the agent under their <b>own identity</b>, it is <b>included</b>, including the AI tools the agent invokes. If the consumer is <b>external</b> or <b>unlicensed</b>, or the agent runs <b>autonomously</b>, uses a <b>Computer-Using Agent</b>, or fires an agent flow from <b>any trigger other than "When an agent calls the flow"</b>, it <b>consumes Copilot Credits</b>. And included does not mean unlimited: fair-usage limits still apply.'},
+    text:'Ask <b>which harness</b> before you ask who the user is. On the <b>standard</b> and <b>Copilot chat</b> harnesses, a <b>licensed employee under their own identity is included</b>, and credits appear only for external, unlicensed, autonomous, CUA or wrong-trigger usage. On the <b>GitHub Copilot harness</b> there is <b>no inclusion at all</b>, the meter starts while you are still authoring, and a single heavy task can exceed 500 credits. <b>Cowork</b> and <b>Work IQ APIs</b> are outside the licence too. And included never means unlimited: fair usage still applies.'},
 
-  footer:'<b>Licensing decision guide</b> — rates and rules compiled from Microsoft Learn: Copilot Studio billing rates and management, licensing for agents powered by the standard harness, and AI Builder prompt licensing. Verified 4 August 2026. Copilot Credits replaced messages as the billing currency on 1 September 2025. Microsoft changes rates, inclusions and fair-usage limits frequently, and the Copilot Studio Licensing Guide is the authoritative source — confirm there before committing to a design or a budget.'
+  footer:'<b>Licensing decision guide</b> — compiled from the Microsoft Copilot Credits Guide (August 2026) and Microsoft Learn: choose a harness, billing for agents powered by the GitHub Copilot harness, billing rates and management, and licensing for agents powered by the standard harness. Verified 4 August 2026. Credit ranges published by Microsoft are rough planning estimates and actual consumption varies with workflow and design; all pricing is USD and subject to change. The Microsoft Copilot Studio Licensing Guide and the Microsoft Product Terms are the authoritative sources — confirm there before committing to a design or a budget.'
 };
 
 /* CONFIG-END */
